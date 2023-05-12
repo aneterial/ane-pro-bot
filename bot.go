@@ -36,6 +36,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 }
 
 func init() {
+	log.SetOutput(os.Stderr)
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
 
@@ -69,7 +70,7 @@ func main() {
 		if err != nil {
 			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
 		}
-		log.Println("add command " + v.Name)
+		log.Println("add cmd", v.Name)
 		registeredCommands[i] = cmd
 	}
 
@@ -84,7 +85,10 @@ func main() {
 		if err != nil {
 			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
 		}
+		log.Println("remove cmd ", v.Name)
 	}
+
+	log.Println("Bot close")
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
