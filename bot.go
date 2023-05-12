@@ -36,7 +36,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 }
 
 func init() {
-	log.SetOutput(os.Stderr)
+	log.SetOutput(os.Stdout)
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
 
