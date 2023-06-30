@@ -34,7 +34,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 	},
-	"enable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	"mod_enable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		heMod = true
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -43,7 +43,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 	},
-	"disable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	"mod_disable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		heMod = false
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -123,7 +123,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, "Ping!!!")
 	}
 
-	if heMod && m.Content == ":he~1:" {
+	if heMod && (m.Content == ":he~1:" || m.Content == ":he:") {
 		s.ChannelMessageSend(m.ChannelID, ":he:")
 	}
 
