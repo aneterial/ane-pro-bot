@@ -24,6 +24,18 @@ var commands = []*discordgo.ApplicationCommand{
 		DefaultPermission:        &dmPermission,
 		DefaultMemberPermissions: &defaultMemberPermissions,
 	},
+	{
+		Name:                     "he_enable",
+		Description:              "enable he mod",
+		DefaultPermission:        &dmPermission,
+		DefaultMemberPermissions: &defaultMemberPermissions,
+	},
+	{
+		Name:                     "he_disable",
+		Description:              "dicable he mod",
+		DefaultPermission:        &dmPermission,
+		DefaultMemberPermissions: &defaultMemberPermissions,
+	},
 }
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 	"time": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -34,7 +46,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 	},
-	"mod_enable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	"he_enable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		heMod = true
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -43,7 +55,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 	},
-	"mod_disable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	"he_disable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		heMod = false
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
