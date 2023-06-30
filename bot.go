@@ -124,7 +124,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if heMod && m.Content == ":he~1:" {
-		s.ChannelMessageSend(m.ChannelID, ":he~1:")
+		s.ChannelMessageSend(m.ChannelID, ":he:")
 	}
 
 	if heMod && m.Content == "👋" {
