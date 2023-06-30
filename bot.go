@@ -12,6 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+var heMod bool = true
 var Token string
 var dmPermission bool = false
 var dg *discordgo.Session
@@ -30,6 +31,24 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "current time is: " + time.Now().Format("2006-01-02 15:04:05.999999999"),
+			},
+		})
+	},
+	"enable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		heMod = true
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "he mod enabled",
+			},
+		})
+	},
+	"disable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		heMod = false
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "he mod disabled",
 			},
 		})
 	},
@@ -102,6 +121,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "pong" {
 		s.ChannelMessageSend(m.ChannelID, "Ping!")
+	}
+
+	if heMod && m.Content == ":he:" {
+		s.ChannelMessageSend(m.ChannelID, ":he:")
+	}
+
+	if heMod && m.Content == ":wave:" {
+		s.ChannelMessageSend(m.ChannelID, ":wave:")
 	}
 }
 
