@@ -6,11 +6,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
+
+const LOG_FILE string = "/var/log/ane_bot/app.log"
 
 var heMod bool = true
 var Token string
@@ -142,10 +145,26 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if heMod && m.Content == "👋" {
 		s.ChannelMessageSend(m.ChannelID, "👋")
 	}
+	if strings.Contains(m.Content, "what is") {
+		s.ChannelMessageSend(m.ChannelID, "logging...")
+		logging(m.Content)
+
+	}
 }
 
 func baseHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 		h(s, i)
 	}
+}
+
+func logging(s string) {
+	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		return
+	}
+	defer logFile.Close()
+
+	log.SetOutput(logFile)
+	log.Println(s)
 }
