@@ -138,8 +138,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, "Ping!!!")
 	}
 
-	if heMod && (m.Content == ":he~1:" || m.Content == ":he:") {
-		s.ChannelMessageSend(m.ChannelID, ":he:")
+	if heMod {
+		if m.Content == "<:he:856194932770471936>" {
+			s.ChannelMessageSend(m.ChannelID, "<:he:856194932770471936>")
+		} else if m.Content == "<:ha:963185474325839912>" {
+			s.ChannelMessageSend(m.ChannelID, "<:ha:963185474325839912>")
+		}
 	}
 
 	if heMod && m.Content == "👋" {
