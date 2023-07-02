@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
@@ -135,21 +136,23 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!!!")
+		s.ChannelMessageSend(m.ChannelID, "Pong")
 
 		return
 	}
 
 	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID, "Ping!!!")
+		s.ChannelMessageSend(m.ChannelID, "Ping")
 
 		return
 	}
 
 	if heMod {
-		if ms.CheckOverflow(m.ChannelID, m.Content) {
-			ms.Flush()
-			go sendMessage(s, m.ChannelID, m.Content)
+		if ms.CheckOverflow(m.ChannelID, m.Author.ID, m.Content) {
+			if rand.Intn(100) > 55 {
+				ms.Flush()
+				go sendMessage(s, m.ChannelID, m.Content)
+			}
 		} else {
 			ms.Fill(m.Author.ID, m.ChannelID, m.Content)
 		}
@@ -195,8 +198,8 @@ func (ms *MessageStash) Empty() bool {
 	return ms.channelID == ""
 }
 
-func (ms *MessageStash) CheckOverflow(channelID string, message string) bool {
-	return ms.channelID == channelID && ms.message == message
+func (ms *MessageStash) CheckOverflow(channelID string, authorID string, message string) bool {
+	return ms.authorID != authorID && ms.channelID == channelID && ms.message == message
 }
 
 func (ms *MessageStash) Fill(authorID string, channelID string, message string) {
