@@ -147,17 +147,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if heMod {
-		if ms.Empty() {
-			ms.Fill(m.Author.ID, m.ChannelID, m.Content)
-
-			return
-		} else if ms.CheckOverflow(m.ChannelID, m.Content) {
+		if ms.CheckOverflow(m.ChannelID, m.Content) {
+			ms.Flush()
 			go sendMessage(s, m.ChannelID, m.Content)
+		} else {
+			ms.Fill(m.Author.ID, m.ChannelID, m.Content)
 		}
-
-		ms.Flush()
-
-		return
 	}
 
 	if heMod && m.Content == "👋" {
