@@ -18,6 +18,7 @@ const LOG_FILE string = "/var/log/ane_bot/app.log"
 var heMod bool = true
 var Token string
 var dmPermission bool = false
+var ms *MessageStash
 var dg *discordgo.Session
 var defaultMemberPermissions int64 = discordgo.PermissionManageServer
 var commands = []*discordgo.ApplicationCommand{
@@ -51,6 +52,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	},
 	"he_enable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		heMod = true
+		logging("he mod enabled")
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -60,6 +62,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	},
 	"he_disable": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		heMod = false
+		logging("he mod disabled")
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -70,6 +73,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 }
 
 func init() {
+	ms = new(MessageStash)
 	log.SetOutput(os.Stdout)
 	flag.StringVar(&Token, "t", "", "Bot Token")
 	flag.Parse()
@@ -132,27 +136,35 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if m.Content == "ping" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!!!")
+
+		return
 	}
 
 	if m.Content == "pong" {
 		s.ChannelMessageSend(m.ChannelID, "Ping!!!")
+
+		return
 	}
 
 	if heMod {
-		if m.Content == "<:he:856194932770471936>" {
-			s.ChannelMessageSend(m.ChannelID, "<:he:856194932770471936>")
-		} else if m.Content == "<:ha:963185474325839912>" {
-			s.ChannelMessageSend(m.ChannelID, "<:ha:963185474325839912>")
+		if ms.Empty() {
+			ms.Fill(m.Author.ID, m.ChannelID, m.Content)
+
+			return
+		} else if ms.CheckOverflow(m.ChannelID, m.Content) {
+			go sendMessage(s, m.ChannelID, m.Content)
 		}
+
+		ms.Flush()
+
+		return
 	}
 
 	if heMod && m.Content == "👋" {
 		s.ChannelMessageSend(m.ChannelID, "👋")
 	}
 	if strings.Contains(m.Content, "what is") {
-		s.ChannelMessageSend(m.ChannelID, "logging...")
-		logging(m.Content)
-
+		s.ChannelMessageSend(m.ChannelID, "У тебя прав нет, фрикич<:he:856194932770471936>")
 	}
 }
 
@@ -171,4 +183,35 @@ func logging(s string) {
 
 	log.SetOutput(logFile)
 	log.Println(s)
+}
+
+func sendMessage(s *discordgo.Session, ChannelID string, message string) {
+	time.Sleep(1 * time.Second)
+	s.ChannelMessageSend(ChannelID, message)
+}
+
+type MessageStash struct {
+	authorID  string
+	channelID string
+	message   string
+}
+
+func (ms *MessageStash) Empty() bool {
+	return ms.channelID == ""
+}
+
+func (ms *MessageStash) CheckOverflow(channelID string, message string) bool {
+	return ms.channelID == channelID && ms.message == message
+}
+
+func (ms *MessageStash) Fill(authorID string, channelID string, message string) {
+	ms.authorID = authorID
+	ms.channelID = channelID
+	ms.message = message
+}
+
+func (ms *MessageStash) Flush() {
+	ms.authorID = ""
+	ms.channelID = ""
+	ms.message = ""
 }
