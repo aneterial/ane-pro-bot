@@ -149,7 +149,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	if heMod {
 		if ms.CheckOverflow(m.ChannelID, m.Author.ID, m.Content) {
-			if rand.Intn(100) > 55 {
+			if rand.Intn(100) > 40 {
 				ms.Flush()
 				go sendMessage(s, m.ChannelID, m.Content)
 			}
