@@ -169,6 +169,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 func baseHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 		h(s, i)
+	} else {
+		logging(fmt.Sprintf("Unknow command `%s`", i.ApplicationCommandData().Name))
 	}
 }
 
@@ -212,4 +214,9 @@ func (ms *MessageStash) Flush() {
 	ms.authorID = ""
 	ms.channelID = ""
 	ms.message = ""
+}
+
+
+func initDayPersons() {
+	
 }
